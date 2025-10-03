@@ -5,15 +5,15 @@ class Telegram:
     API_HASH = env.get("TELEGRAM_API_HASH", "15564ec4a1a2cbef87c9aa9e40b34")
     OWNER_ID = int(env.get("OWNER_ID", "770434685"))
     ALLOWED_USER_IDS = env.get("ALLOWED_USER_IDS", "").split()
-    BOT_USERNAME = env.get("TELEGRAM_BOT_USERNAME", "Jgghuhfjjjbot")
-    BOT_TOKEN = env.get("TELEGRAM_BOT_TOKEN", "7915259408:AAHrTD0K1OQD7DZfBiZgjYLeoQoFAwJ3kY0")
+    BOT_USERNAME = env.get("TELEGRAM_BOT_USERNAME", "Jgghuhffhjjjbot")
+    BOT_TOKEN = env.get("TELEGRAM_BOT_TOKEN", "7915259408:AAEWn7VrfRJI5bhGDPWdNetK_kbDJ8ksWyQ")
     CHANNEL_ID = int(env.get("TELEGRAM_CHANNEL_ID", -1002479847516))
     SECRET_CODE_LENGTH = int(env.get("SECRET_CODE_LENGTH", 24))
 
 class Server:
-    BASE_URL = env.get("BASE_URL", "http://vps.hostingup.icu:8080")
+    BASE_URL = env.get("BASE_URL", "http://65.108.9.125:8081")
     BIND_ADDRESS = env.get("BIND_ADDRESS", "0.0.0.0")
-    PORT = int(env.get("PORT", 8080))
+    PORT = int(env.get("PORT", 8081))
 
 # LOGGING CONFIGURATION
 LOGGER_CONFIG_JSON = {
@@ -54,6 +54,7 @@ LOGGER_CONFIG_JSON = {
         }
     }
 }
+
 
 
 
