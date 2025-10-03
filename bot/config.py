@@ -1,19 +1,19 @@
 from os import environ as env
 
 class Telegram:
-    API_ID = int(env.get("TELEGRAM_API_ID", 21344245))
-    API_HASH = env.get("TELEGRAM_API_HASH", "e72de40c666f1664f847a79f97dd3882")
+    API_ID = int(env.get("TELEGRAM_API_ID", 12850056))
+    API_HASH = env.get("TELEGRAM_API_HASH", "15564ec4a1a2cbef87c99a9aa9e40b34")
     OWNER_ID = int(env.get("OWNER_ID", 770434685))
     ALLOWED_USER_IDS = env.get("ALLOWED_USER_IDS", "").split()
-    BOT_USERNAME = env.get("TELEGRAM_BOT_USERNAME", "Khfdggfbot")
-    BOT_TOKEN = env.get("TELEGRAM_BOT_TOKEN", "8451118910:AAFBxi4BA9i-fTsDFBY2WnFT2W252JWVcRM")
+    BOT_USERNAME = env.get("TELEGRAM_BOT_USERNAME", "Hfghffjijjbot")
+    BOT_TOKEN = env.get("TELEGRAM_BOT_TOKEN", "8434324773:AAHUkr8BXJ05t-V0HbSxZ4itXF-IvjJBd84")
     CHANNEL_ID = int(env.get("TELEGRAM_CHANNEL_ID", "-1002479847516"))
     SECRET_CODE_LENGTH = int(env.get("SECRET_CODE_LENGTH", 24))
 
 class Server:
-    BASE_URL = env.get("BASE_URL", "http://65.108.9.125:8085")
+    BASE_URL = env.get("BASE_URL", "http://65.108.9.125:8080")
     BIND_ADDRESS = env.get("BIND_ADDRESS", "0.0.0.0")
-    PORT = int(env.get("PORT", 8085))
+    PORT = int(env.get("PORT", 8080))
 
 # LOGGING CONFIGURATION
 LOGGER_CONFIG_JSON = {
@@ -54,6 +54,7 @@ LOGGER_CONFIG_JSON = {
         }
     }
 }
+
 
 
 
