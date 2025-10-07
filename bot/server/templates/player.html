@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Play Files</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Frame-Options" content="deny">
+
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+      }
+
+      #stream-media {
+        height: 100%;
+        width: 100%;
+      }
+
+      #error-message {
+        color: red;
+        font-size: 24px;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .plyr__volume {
+        max-width: initial;
+        min-width: initial;
+        width: auto;
+        position: relative;
+      }
+
+      .plyr, .plyr__video-wrapper, .plyr__video-embed iframe {
+        height: 100%;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <video id="stream-media" controls preload="auto">
+      <source src="" type="">
+      <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider upgrading to a web browser that supports HTML5 video
+      </p>
+    </video>
+
+    <div id="error-message"></div>
+
+    <script>
+      var player = new Plyr('#stream-media', {
+          controls:['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'settings', 'pip', 'fullscreen'],
+          settings:['speed','loop'],
+          speed:{selected:1,options:[0.25,0.5,0.75,1,1.25,1.5,1.75,2]},
+          seek: 10,
+          keyboard: { focused: true, global: true },
+      });
+
+      var mediaLink = "{{ mediaLink }}";
+
+      if (mediaLink) {
+          document.querySelector('#stream-media source').setAttribute('src', mediaLink);
+          player.restart();
+
+      } else {
+          document.getElementById('error-message').textContent = 'Error: Media URL not provided';
+      }
+
+      // Jab player fullscreen mein enter kare, to landscape mode lock karein
+      player.on('enterfullscreen', function() {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(function() {
+            // Ignore errors
+          });
+        }
+      });
+
+      // Jab player fullscreen se bahar nikle, to orientation unlock karein
+      player.on('exitfullscreen', function() {
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        }
+      });
+    </script>
+
+  </body>
+</html>
