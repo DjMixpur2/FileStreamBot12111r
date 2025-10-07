@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FileStream Player</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-Frame-Options" content="deny">
+
+    <!-- Plyr Player CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <!-- Font Awesome for Feedback Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Plyr Player JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #player-container {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+        }
+        
+        #player {
+            max-height: 100vh;
+            width: 100%;
+        }
+
+        #error-message {
+            color: #ff5555;
+            font-size: 24px;
+            text-align: center;
+            padding: 20px;
+            display: none; /* Default mein hidden */
+        }
+        
+        #gesture-feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 24px;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.2s ease-out;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #gesture-feedback.visible { opacity: 1; }
+        #gesture-feedback i { font-size: 36px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="player-container">
+        <!-- poster attribute mein abhi default image hai. -->
+        <!-- Future mein aap yahan apne bot se {{ posterLink }} bhi pass kar sakte hain -->
+        <video id="player" controls preload="auto" 
+               poster="https://i.ibb.co/6r3g2Vw/poster.jpg">
+        </video>
+        
+        <div id="gesture-feedback"></div>
+    </div>
+    
+    <div id="error-message"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aapke bot se bheja hua link is variable mein aayega
+            const mediaLink = "{{ mediaLink }}";
+
+            const playerContainer = document.getElementById('player-container');
+            const errorMessage = document.getElementById('error-message');
+
+            // Check karte hain ki bot se link mila ya nahi
+            if (mediaLink && mediaLink !== "{{ mediaLink }}") {
+                const videoElement = document.getElementById('player');
+                videoElement.innerHTML = `<source src="${mediaLink}" type="video/mp4">`;
+
+                const player = new Plyr('#player', {
+                    controls: [
+                        'play-large', 'restart', 'rewind', 'play', 'fast-forward', 'progress',
+                        'current-time', 'duration', 'mute', 'volume', 'settings', 'pip',
+                        'airplay', 'fullscreen'
+                    ],
+                    settings: ['speed', 'loop'],
+                    speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+                    keyboard: { focused: true, global: true },
+                    tooltips: { controls: true, seek: true },
+                });
+                
+                // Baki saara gesture aur player ka code
+                player.on('enterfullscreen', () => screen.orientation?.lock('landscape').catch(() => {}));
+                player.on('exitfullscreen', () => screen.orientation?.unlock());
+
+                const feedbackElement = document.getElementById('gesture-feedback');
+                let lastTap = 0, touchStartX = 0, touchStartY = 0, touchAction = '', initialBrightness = 1, hideFeedbackTimeout;
+                function showFeedback(iconClass, text) { clearTimeout(hideFeedbackTimeout); feedbackElement.innerHTML = `<i class="fas ${iconClass}"></i><span>${text}</span>`; feedbackElement.classList.add('visible'); hideFeedbackTimeout = setTimeout(() => { feedbackElement.classList.remove('visible'); }, 800); }
+                playerContainer.addEventListener('touchstart', (e) => { if (e.touches.length === 1) { const touch = e.touches[0]; touchStartX = touch.clientX; touchStartY = touch.clientY; touchAction = ''; } }, { passive: true });
+                playerContainer.addEventListener('touchmove', (e) => { e.preventDefault(); if (e.touches.length === 1) { const touch = e.touches[0]; const deltaX = touch.clientX - touchStartX; const deltaY = touch.clientY - touchStartY; if (touchAction === '') { if (Math.abs(deltaX) > Math.abs(deltaY)) { touchAction = 'seek'; } else { if (touchStartX < window.innerWidth / 2) { touchAction = 'brightness'; } else { touchAction = 'volume'; } } } if (touchAction === 'seek') { player.currentTime += deltaX / 10; touchStartX = touch.clientX; } else if (touchAction === 'volume') { player.volume = Math.max(0, Math.min(1, player.volume + (-deltaY / 100))); showFeedback('fa-volume-up', `${(player.volume * 100).toFixed(0)}%`); touchStartY = touch.clientY; } else if (touchAction === 'brightness') { initialBrightness = Math.max(0, Math.min(2, initialBrightness + (-deltaY / 100))); player.elements.container.style.filter = `brightness(${initialBrightness})`; showFeedback('fa-sun', `${(initialBrightness * 100).toFixed(0)}%`); touchStartY = touch.clientY; } } }, { passive: false });
+                playerContainer.addEventListener('touchend', (e) => { const currentTime = new Date().getTime(); const tapLength = currentTime - lastTap; if (tapLength < 300 && tapLength > 0) { const rect = playerContainer.getBoundingClientRect(); const tapX = e.changedTouches[0].clientX - rect.left; if (tapX < rect.width / 2) { player.rewind(); showFeedback('fa-backward', '-10s'); } else { player.forward(); showFeedback('fa-forward', '+10s'); } e.preventDefault(); } lastTap = currentTime; touchAction = ''; });
+            
+            } else {
+                // Agar bot se link nahi mila to error dikhayein
+                playerContainer.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Error: Media URL not found.';
+            }
+        });
+    </script>
+
+</body>
+</html>
